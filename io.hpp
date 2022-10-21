@@ -6,7 +6,6 @@
 template <typename T> void write(std::fstream& outstream, T& out) {
     const size_t bytes = sizeof(out);
     outstream.write((const char *)&out, bytes);
-    outstream.seekg(bytes, std::ios_base::cur);
 }
 template <typename T> void write(std::fstream& outstream, Param<T>& out) {
     for (int i = 0; i < 4; i++) write(outstream, out.info.dims[i]);
@@ -17,10 +16,32 @@ template <typename T> void write(std::fstream& outstream, Param<T>& out) {
     const int nelems = out.info.dims[0] * out.info.dims[1] * out.info.dims[2] * out.info.dims[3];
     for (int i = 0; i < nelems; i++) write(outstream, out_data[i]);
 }
-template <typename T> void read(T& out, std::fstream& instream) {
-    size_t bytes = sizeof(T);
-    instream.read((char *)&out, bytes);
-    instream.seekg(bytes, std::ios_base::cur);
+template <typename T> void write(std::fstream& outstream, sycl::buffer<T, 2>& out) {
+    Param<T> outParam;
+    auto dims = out.get_range();
+    outParam.info.dims[0] = dims[0];
+    outParam.info.dims[1] = dims[1];
+    outParam.info.dims[2] = 1;
+    outParam.info.dims[3] = 1;
+    outParam.info.strides[0] = 1;
+    outParam.info.strides[1] = outParam.info.strides[0] * outParam.info.dims[0];
+    outParam.info.strides[2] = outParam.info.strides[1] * outParam.info.dims[1];
+    outParam.info.strides[3] = outParam.info.strides[2] * outParam.info.dims[2];
+    outParam.info.offset = 0;
+    outParam.data = new sycl::buffer<T, 1>{sycl::range{dims[0] * dims[1]}};
+    {
+      const sycl::host_accessor<T, 2> outAcc(out);
+      const sycl::host_accessor<T> outBufferAcc(*outParam.data);
+      int idx = 0;
+      for (int j = 0; j < dims[1]; j++)
+        for (int i = 0; i < dims[0]; i++)
+          outBufferAcc[idx++] = outAcc[i][j];
+    }
+    write(outstream, outParam);
+}
+template <typename T> void read(T &out, std::fstream &instream) {
+  size_t bytes = sizeof(T);
+  instream.read((char *)&out, bytes);
 }
 template <typename T> void read(Param<T>& out, std::fstream& instream) {
     for (int i = 0; i < 4; i++) read(out.info.dims[i], instream);
@@ -34,8 +55,18 @@ template <typename T> void read(Param<T>& out, std::fstream& instream) {
     for (int i = 0; i < nelems; i++) read(out_data[i], instream);
 }
 
-#define OPEN_W(FN)  std::fstream in_out(FN, std::ios::binary | std::ios::out | std::ios::trunc);
-#define OPEN_R(FN)  std::fstream in_out(FN, std::ios::binary | std::ios::in);
+#define OPEN_W(FN)                                                             \
+  std::fstream in_out(FN, std::ios::binary | std::ios::out | std::ios::trunc); \
+  if (!in_out.good()) {                                                 \
+    printf("could not open file %s\n", #FN);                            \
+    exit(1);                                                            \
+  }
+#define OPEN_R(FN)                                                      \
+  std::fstream in_out(FN, std::ios::binary | std::ios::in);             \
+  if (!in_out.good()) {                                                 \
+    printf("could not open file %s\n", #FN);                            \
+    exit(1);                                                            \
+  }
 #define WRITE(VAR)  write(in_out, VAR)
 #define READ(VAR)   read(VAR, in_out)
 

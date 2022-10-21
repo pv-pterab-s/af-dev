@@ -43,13 +43,15 @@ int main() {
     int a_ = 16; int b_ = 32;
     {
       OPEN_W("doo");
-      WRITE(a_); WRITE(b_); WRITE(c_);
+      WRITE(c_);
+      // WRITE(a_); WRITE(b_); WRITE(c_);
     }
 
     int a__; int b__; Param<float> c__;
     {
       OPEN_R("doo");
-      READ(a__); READ(b__); READ(c__);
+      READ(c__);
+      // READ(a__); READ(b__); READ(c__);
     }
     // check "doo" by hand
     return 0;
