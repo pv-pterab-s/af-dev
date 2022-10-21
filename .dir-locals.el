@@ -1,4 +1,1 @@
-;;; Directory Local Variables
-;;; For more information see (info "(emacs) Directory Variables")
-
-((c++-mode . ((compile-command . "source /opt/intel/oneapi/setvars.sh intel64 && icxp m.cc"))))
+((c++-mode . ((compile-command . "mkdir -p out && /usr/bin/time icpx -fsycl -I/home/gpryor/arrayfire/include -I/home/gpryor/arrayfire/build/include main.cpp -o out/main && cd out && ./main"))))
