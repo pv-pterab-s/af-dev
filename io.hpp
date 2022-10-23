@@ -55,17 +55,17 @@ template <typename T> void read(Param<T>& out, std::fstream& instream) {
     for (int i = 0; i < nelems; i++) read(out_data[i], instream);
 }
 
-#define OPEN_W(FN)                                                             \
+#define OPEN_W(FN)                                                      \
   std::fstream in_out(FN, std::ios::binary | std::ios::out | std::ios::trunc); \
   if (!in_out.good()) {                                                 \
-    printf("could not open file %s\n", #FN);                            \
+    printf("could not open file %s\n", FN);                             \
     exit(1);                                                            \
   }
-#define OPEN_R(FN)                                                      \
-  std::fstream in_out(FN, std::ios::binary | std::ios::in);             \
-  if (!in_out.good()) {                                                 \
-    printf("could not open file %s\n", #FN);                            \
-    exit(1);                                                            \
+#define OPEN_R(FN)                                              \
+  std::fstream in_out(FN, std::ios::binary | std::ios::in);     \
+  if (!in_out.good()) {                                         \
+    printf("could not open file %s\n", FN);                     \
+    exit(1);                                                    \
   }
 #define WRITE(VAR)  write(in_out, VAR)
 #define READ(VAR)   read(VAR, in_out)

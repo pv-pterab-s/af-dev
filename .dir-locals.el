@@ -1,2 +1,3 @@
-((c++-mode . ((compile-command . "mkdir -p out && /usr/bin/time icpx -g -fsycl -I/home/gpryor/arrayfire/include -I/home/gpryor/arrayfire/build/include main.cpp -o out/main && cd out && ./main")))
- (octave-mode . ((compile-command . "./go.sh"))))
+((c++-mode . ((compile-command . "./build.sh /home/gpryor/arrayfire/build/test-data-000")))
+ (octave-mode . ((compile-command . "./go.sh")))
+ (sh-mode . ((compile-command . "./build.sh /home/gpryor/arrayfire/build/test-data-000"))))
