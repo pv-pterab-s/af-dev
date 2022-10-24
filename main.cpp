@@ -60,18 +60,19 @@ using cfloat  = std::complex<float>;     // above is arrayfire emulation
 #include "impl.hpp"
 
 int main(int argc, char **argv) {
-  Param<float> in;
-  Param<float> out;
-  float theta;
-  af_interp_type method;
-  int order;
-  OPEN_R(argv[1]);
-  READ(in);
-  READ(out);
-  READ(theta);
-  READ(method);
-  READ(order);
-  rotate<float>(out, in, theta, method, order);
+
+  // Param<float> in;
+  // Param<float> out;
+  // float theta;
+  // af_interp_type method;
+  // int order;
+  // OPEN_R(argv[1]);
+  // READ(in);
+  // READ(out);
+  // READ(theta);
+  // READ(method);
+  // READ(order);
+  // <float>(out, in, theta, method, order);
   // {
   //   OPEN_W("run-output");
   //   WRITE(out);
