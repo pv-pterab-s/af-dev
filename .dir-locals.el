@@ -1,3 +1,3 @@
-((c++-mode . ((compile-command . "./build.sh /home/gpryor/arrayfire/build/test-data-000")))
+((c++-mode . ((compile-command . "./build.sh")))
  (octave-mode . ((compile-command . "./go.sh")))
- (sh-mode . ((compile-command . "./build.sh /home/gpryor/arrayfire/build/test-data-000"))))
+ (sh-mode . ((compile-command . "./build.sh"))))

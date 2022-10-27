@@ -7,7 +7,11 @@
 // #define M(S)                                    \
 //   { printf("%lld\n", (S)); }
 
+#define ONEAPI_DEBUG_FINISH(S) ;
+
 #define divup(a, b) (((a) + (b)-1) / (b))
+
+typedef unsigned char uchar;
 
 typedef struct {
     dim_t dims[4];
@@ -53,28 +57,83 @@ sycl::queue getQueue() {
 }
 
 using cdouble = std::complex<double>;
-using cfloat  = std::complex<float>;     // above is arrayfire emulation
+using cfloat  = std::complex<float>;
+
+
+// TODO AF_BATCH_UNSUPPORTED is not required and shouldn't happen
+//      Code changes are required to handle all cases properly
+//      and this enum value should be removed.
+typedef enum {
+    AF_BATCH_UNSUPPORTED = -1, /* invalid inputs */
+    AF_BATCH_NONE,             /* one signal, one filter   */
+    AF_BATCH_LHS,              /* many signal, one filter  */
+    AF_BATCH_RHS,              /* one signal, many filter  */
+    AF_BATCH_SAME,             /* signal and filter have same batch size */
+    AF_BATCH_DIFF,             /* signal and filter have different batch size */
+} AF_BATCH_KIND;
+
+// #include
+// ^^^^^^^^^ above is arrayfire emulation
+
+#define READ_NOT_WRITE
 
 #include "io.hpp"
-
 #include "impl.hpp"
+
+using namespace sycl;
 
 int main(int argc, char **argv) {
 
-  // Param<float> in;
-  // Param<float> out;
-  // float theta;
-  // af_interp_type method;
-  // int order;
-  // OPEN_R(argv[1]);
-  // READ(in);
-  // READ(out);
-  // READ(theta);
-  // READ(method);
-  // READ(order);
-  // <float>(out, in, theta, method, order);
-  // {
-  //   OPEN_W("run-output");
-  //   WRITE(out);
-  // }
+#if 1
+    OPEN_R("/home/gpryor/fun/test-data");
+    Param<float> signal;
+    Param<float> filter;
+    Param<float> out;
+    AF_BATCH_KIND kind;
+    int rank;
+    bool expand;
+
+    READ(signal); READ(filter); READ(out); READ(kind); READ(rank); READ(expand);
+    // print(signal);
+    // print(filter);
+    // exit(0);
+
+    convolve_nd<float, float>(out, signal, filter, kind, rank, expand);
+    // print(out);
+
+    // print(signal);
+    print(filter);
+    // print(out);
+
+    {
+      OPEN_W("run-filter");
+      WRITE(filter);
+    }
+
+    {
+      OPEN_W("run-output");
+      WRITE(out);
+    }
+#endif
+
+#if 0
+    // the following shows a non-trivial memcpy
+    constexpr int M = 6;
+    float a[M], b[M];
+    for (int i = 0; i < M; i++) {
+      a[i] = 10 + i;
+      b[i] = 4;
+    }
+    sycl::buffer<float, 1> aBuf{a, range<1>{M}};
+    sycl::buffer<float, 1> bBuf{b, range<1>{M}};
+
+    // queue Q;
+    // Q.submit([&](auto &h) {
+    //     accessor aAcc{aBuf, h, sycl::range{M - 1}, sycl::id{0}, read_only};
+    //     accessor bAcc{bBuf, h, sycl::range{M - 1}, sycl::id{1}, write_only, no_init};
+    //     h.copy(aAcc, bAcc);     // from a to b
+    // }).wait();
+    memcpyBuffer(bBuf, aBuf, 5, 1);
+    getQueue().wait();
+#endif
 }
