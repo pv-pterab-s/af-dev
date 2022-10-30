@@ -2,11 +2,6 @@
 #include <arrayfire.h>
 #include <stdlib.h>
 
-// #define MSG(S)                                  \
-//   { printf("S##\n"); }
-// #define M(S)                                    \
-//   { printf("%lld\n", (S)); }
-
 #define ONEAPI_DEBUG_FINISH(S) ;
 
 #define divup(a, b) (((a) + (b)-1) / (b))
@@ -83,8 +78,29 @@ typedef enum {
 using namespace sycl;
 
 int main(int argc, char **argv) {
+    // read test data
+    Param<float> out;
+    Param<float> sig;
+    Param<float> filt;
+    int cDim;
+    bool expand;
 
-#if 1
+    OPEN_R("/home/gpryor/fun/test-data-1");
+    READ(out);
+    READ(sig);
+    READ(filt);
+    READ(cDim);
+    READ(expand);
+
+    convSep<float, float>(out, sig, filt, cDim, expand);
+
+    // octave sounds great for render, but easier here w/ M(out)
+    {
+      OPEN_W("run-output");
+      WRITE(out);
+    }
+
+#if 0
     OPEN_R("/home/gpryor/fun/test-data");
     Param<float> signal;
     Param<float> filter;
