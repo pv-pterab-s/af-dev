@@ -34,7 +34,7 @@ template <typename T> void write(std::fstream& outstream, sycl::buffer<T, 2>& ou
     outParam.data = new sycl::buffer<T, 1>{sycl::range{dims[0] * dims[1]}};
     {
       const sycl::host_accessor<T, 2> outAcc(out);
-      const sycl::host_accessor<T, 2> outBufferAcc(*outParam.data);
+      const sycl::host_accessor<T, 1> outBufferAcc(*outParam.data);
       int idx = 0;
       for (int j = 0; j < dims[1]; j++)
         for (int i = 0; i < dims[0]; i++)
@@ -77,20 +77,6 @@ template <typename T> void read(Param<T>& out, std::fstream& instream) {
 
     const sycl::host_accessor<T> out_data(*out.data);
     for (int i = 0; i < nelems; i++) read(out_data[i], instream);
-}
-
-template <typename T> void print(Param<T> &out) {
-    //  assert(out.info.dims[1] == 1);
-    // for (int i = 0; i < 4; i++) write(outstream, out.info.dims[i]);
-    // for (int i = 0; i < 4; i++) write(outstream, out.info.strides[i]);
-    // write(outstream, out.info.offset);
-
-    const sycl::host_accessor<T> out_data(*out.data);
-
-    const int nelems = out.info.dims[0] * out.info.dims[1] * out.info.dims[2] * out.info.dims[3];
-    for (int i = 0; i < nelems; i++) {
-      printf("%f\n", (float)out_data[i]);
-    }
 }
 
 #define OPEN_W(FN)                                                      \
