@@ -3,8 +3,12 @@ set -e
 
 if [ main.cpp -nt out/main ] || [ impl.hpp -nt out/main ]; then # only build if sources updated
     echo building
+
+    # # link (for run)
     mkdir -p out && icpx -g -fsycl -I/home/gpryor/arrayfire/include -I/home/gpryor/arrayfire/build/include -L/home/gpryor/arrayfire/build/src/backend/oneapi -lafoneapi  main.cpp -o out/main
-    # mkdir -p out && icpx -g -fsycl -I/home/gpryor/arrayfire/include -I/home/gpryor/arrayfire/build/include -L/home/gpryor/arrayfire/build/src/backend/oneapi  -c main.cpp -o out/main.o
+
+    # # compile only (fast)
+    # mkdir -p out && /usr/bin/time icpx -g -fsycl -I/home/gpryor/arrayfire/include -I/home/gpryor/arrayfire/build/include -L/home/gpryor/arrayfire/build/src/backend/oneapi -c main.cpp -o out/main.o
     # exit
 fi
 cd out

@@ -78,27 +78,13 @@ typedef enum {
 using namespace sycl;
 
 int main(int argc, char **argv) {
-    // read test data
-    Param<float> out;
-    Param<float> sig;
-    Param<float> filt;
-    int cDim;
-    bool expand;
+    Param<float> out; Param<float> in; dim_t rdims[4];
 
-    OPEN_R("/home/gpryor/fun/test-data-1");
-    READ(out);
-    READ(sig);
-    READ(filt);
-    READ(cDim);
-    READ(expand);
+    OPEN_R("/home/gpryor/arrayfire/build/reorder-stuff");
+    READ(out); READ(in); READ(rdims[0]); READ(rdims[1]); READ(rdims[2]); READ(rdims[3]);
+    M(in);
 
-    convSep<float, float>(out, sig, filt, cDim, expand);
-
-    // octave sounds great for render, but easier here w/ M(out)
-    {
-      OPEN_W("run-output");
-      WRITE(out);
-    }
+    // reorder(out, in, rdims);
 
 #if 0
     OPEN_R("/home/gpryor/fun/test-data");
